@@ -181,7 +181,7 @@ func TestEtchashSearchAcrossEpoch(t *testing.T) {
 	}
 	defer os.RemoveAll(eth.Full.Dir)
 
-	for i := epochLength - 40; i < epochLength+40; i++ {
+	for i := epochLengthDefault - 40; i < epochLengthDefault+40; i++ {
 		block := &testBlock{number: i, difficulty: big.NewInt(90)}
 		rand.Read(block.hashNoNonce[:])
 		nonce, md := eth.Search(block, nil, 0)

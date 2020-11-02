@@ -51,7 +51,10 @@ var (
 )
 
 const (
-	epochLength         uint64     = 30000
+	epochLengthDefault  uint64 = 30000
+	epochLengthECIP1099 uint64 = 60000
+	ecip1099FBlock      uint64 = 11700000 // classic mainnet
+	// ecip1099FBlock uint64 = 2520000 // mordor
 	cacheSizeForTesting C.uint64_t = 1024
 	dagSizeForTesting   C.uint64_t = 1024 * 32
 )
@@ -72,9 +75,10 @@ func defaultDir() string {
 // cache wraps an etchash_light_t with some metadata
 // and automatic memory management.
 type cache struct {
-	epoch uint64
-	used  time.Time
-	test  bool
+	epoch       uint64
+	epochLength uint64
+	used        time.Time
+	test        bool
 
 	gen sync.Once // ensures cache is only generated once.
 	ptr *C.struct_etchash_light
@@ -86,9 +90,9 @@ type cache struct {
 func (cache *cache) generate() {
 	cache.gen.Do(func() {
 		started := time.Now()
-		seedHash := makeSeedHash(cache.epoch)
+		seedHash := makeSeedHash(cache.epoch * cache.epochLength)
 		log.Debug(fmt.Sprintf("Generating cache for epoch %d (%x)", cache.epoch, seedHash))
-		size := C.etchash_get_cachesize(C.uint64_t(cache.epoch * epochLength))
+		size := C.etchash_get_cachesize(C.uint64_t(cache.epoch * epochLengthDefault))
 		if cache.test {
 			size = cacheSizeForTesting
 		}
@@ -129,8 +133,8 @@ func (l *Light) Verify(block Block) bool {
 	// TODO: do etchash_quick_verify before getCache in order
 	// to prevent DOS attacks.
 	blockNum := block.NumberU64()
-	if blockNum >= epochLength*2048 {
-		log.Debug(fmt.Sprintf("block number %d too high, limit is %d", epochLength*2048))
+	if blockNum >= epochLengthDefault*2048 {
+		log.Debug(fmt.Sprintf("block number %d too high, limit is %d", epochLengthDefault*2048))
 		return false
 	}
 
@@ -176,7 +180,12 @@ func hashToH256(in common.Hash) C.etchash_h256_t {
 
 func (l *Light) getCache(blockNum uint64) *cache {
 	var c *cache
-	epoch := blockNum / epochLength
+	epoch := blockNum / epochLengthDefault
+	epochLength := epochLengthDefault
+	if blockNum >= ecip1099FBlock {
+		epoch = blockNum / epochLengthECIP1099
+		epochLength = epochLengthECIP1099
+	}
 
 	// If we have a PoW for that epoch, use that
 	l.mu.Lock()
@@ -205,14 +214,22 @@ func (l *Light) getCache(blockNum uint64) *cache {
 			c, l.future = l.future, nil
 		} else {
 			log.Debug(fmt.Sprintf("No pre-generated DAG available, creating new for epoch %d", epoch))
-			c = &cache{epoch: epoch, test: l.test}
+			c = &cache{epoch: epoch, epochLength: epochLength, test: l.test}
 		}
 		l.caches[epoch] = c
 
+		var nextEpoch = epoch + 1
+		var nextEpochLength = epochLength
+		var nextEpochBlock = nextEpoch * epochLength
+		if nextEpochBlock == ecip1099FBlock && epochLength == epochLengthDefault {
+			nextEpoch = nextEpoch / 2
+			nextEpochLength = epochLengthECIP1099
+		}
+
 		// If we just used up the future cache, or need a refresh, regenerate
 		if l.future == nil || l.future.epoch <= epoch {
-			log.Debug(fmt.Sprintf("Pre-generating DAG for epoch %d", epoch+1))
-			l.future = &cache{epoch: epoch + 1, test: l.test}
+			log.Debug(fmt.Sprintf("Pre-generating DAG for epoch %d", nextEpoch))
+			l.future = &cache{epoch: nextEpoch, epochLength: nextEpochLength, test: l.test}
 			go l.future.generate()
 		}
 	}
@@ -227,9 +244,10 @@ func (l *Light) getCache(blockNum uint64) *cache {
 // dag wraps an etchash_full_t with some metadata
 // and automatic memory management.
 type dag struct {
-	epoch uint64
-	test  bool
-	dir   string
+	epoch       uint64
+	epochLength uint64
+	test        bool
+	dir         string
 
 	gen sync.Once // ensures DAG is only generated once.
 	ptr *C.struct_etchash_full
@@ -242,8 +260,8 @@ func (d *dag) generate() {
 	d.gen.Do(func() {
 		var (
 			started   = time.Now()
-			seedHash  = makeSeedHash(d.epoch)
-			blockNum  = C.uint64_t(d.epoch * epochLength)
+			seedHash  = makeSeedHash(d.epoch * d.epochLength)
+			blockNum  = C.uint64_t(d.epoch * d.epochLength)
 			cacheSize = C.etchash_get_cachesize(blockNum)
 			dagSize   = C.etchash_get_datasize(blockNum)
 		)
@@ -294,9 +312,9 @@ func etchashGoCallback(percent C.unsigned) C.int {
 // given directory. If dir is the empty string, the default directory
 // is used.
 func MakeDAG(blockNum uint64, dir string) error {
-	d := &dag{epoch: blockNum / epochLength, dir: dir}
-	if blockNum >= epochLength*2048 {
-		return fmt.Errorf("block number too high, limit is %d", epochLength*2048)
+	d := &dag{epoch: blockNum / epochLengthDefault, dir: dir}
+	if blockNum >= epochLengthDefault*2048 {
+		return fmt.Errorf("block number too high, limit is %d", epochLengthDefault*2048)
 	}
 	d.generate()
 	if d.ptr == nil {
@@ -318,12 +336,17 @@ type Full struct {
 }
 
 func (pow *Full) getDAG(blockNum uint64) (d *dag) {
-	epoch := blockNum / epochLength
+	epoch := blockNum / epochLengthDefault
+	epochLength := epochLengthDefault
+	if blockNum >= ecip1099FBlock {
+		epoch = blockNum / epochLengthECIP1099
+		epochLength = epochLengthECIP1099
+	}
 	pow.mu.Lock()
 	if pow.current != nil && pow.current.epoch == epoch {
 		d = pow.current
 	} else {
-		d = &dag{epoch: epoch, test: pow.test, dir: pow.Dir}
+		d = &dag{epoch: epoch, epochLength: epochLength, test: pow.test, dir: pow.Dir}
 		pow.current = d
 	}
 	pow.mu.Unlock()
@@ -424,14 +447,18 @@ func NewForTesting() (*Etchash, error) {
 }
 
 func GetSeedHash(blockNum uint64) ([]byte, error) {
-	if blockNum >= epochLength*2048 {
-		return nil, fmt.Errorf("block number too high, limit is %d", epochLength*2048)
+	if blockNum >= epochLengthDefault*2048 {
+		return nil, fmt.Errorf("block number too high, limit is %d", epochLengthDefault*2048)
 	}
-	sh := makeSeedHash(blockNum / epochLength)
+	sh := makeSeedHash(blockNum)
 	return sh[:], nil
 }
 
-func makeSeedHash(epoch uint64) (sh common.Hash) {
+func makeSeedHash(blockNum uint64) (sh common.Hash) {
+	epoch := blockNum / epochLengthDefault
+	if blockNum >= ecip1099FBlock {
+		epoch = blockNum / epochLengthECIP1099
+	}
 	for ; epoch > 0; epoch-- {
 		sh = crypto.Sha3Hash(sh[:])
 	}
