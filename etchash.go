@@ -53,8 +53,8 @@ var (
 const (
 	epochLengthDefault  uint64 = 30000
 	epochLengthECIP1099 uint64 = 60000
-	ecip1099FBlock      uint64 = 11700000 // classic mainnet
-	// ecip1099FBlock uint64 = 2520000 // mordor
+	// ecip1099FBlock      uint64 = 11700000 // classic mainnet
+	ecip1099FBlock uint64 = 2520000 // mordor
 	cacheSizeForTesting C.uint64_t = 1024
 	dagSizeForTesting   C.uint64_t = 1024 * 32
 )
