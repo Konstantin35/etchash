@@ -1,10 +1,15 @@
-[![Build Status](https://travis-ci.org/ethereum/etchash.svg?branch=master)](https://travis-ci.org/ethereum/etchash)
-[![Windows Build Status](https://ci.appveyor.com/api/projects/status/github/debris/etchash?branch=master&svg=true)](https://ci.appveyor.com/project/debris/etchash-nr37r/branch/master)
-
 # Etchash
 
-For details on this project, please see the Ethereum wiki:
-https://github.com/ethereum/wiki/wiki/Etchash
+Etchash is a modified version of ethash, recalibrated via ECIP-1099:
+https://github.com/ethereumclassic/ECIPs/blob/master/_specs/ecip-1099.md
+
+For details on etchash, please see the Ethereum wiki:
+https://github.com/ethereum/wiki/wiki/Ethash
+
+### Notes
+
+ubuntu:
+`apt-get install libboost-all-dev`
 
 ### Coding Style for C++ code:
 
