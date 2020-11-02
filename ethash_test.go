@@ -15,7 +15,7 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with the go-ethereum library. If not, see <http://www.gnu.org/licenses/>.
 
-package ethash
+package etchash
 
 import (
 	"bytes"
@@ -207,7 +207,7 @@ func TestGetSeedHash(t *testing.T) {
 	}
 
 	// From python:
-	// > from pyethash import get_seedhash
+	// > from pyetchash import get_seedhash
 	// > get_seedhash(30000)
 	expectedSeed1, err := hex.DecodeString("290decd9548b62a8d60345a988386fc84ba6bc95484008f6362f93160ef3e563")
 	if err != nil {

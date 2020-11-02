@@ -10,7 +10,7 @@ include src/python/core.c
 include src/libetchash/compiler.h
 include src/libetchash/data_sizes.h
 include src/libetchash/endian.h
-include src/libetchash/ethash.h
+include src/libetchash/etchash.h
 include src/libetchash/fnv.h
 include src/libetchash/internal.h
 include src/libetchash/sha3.h

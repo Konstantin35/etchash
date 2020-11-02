@@ -1,8 +1,8 @@
 cmake_minimum_required(VERSION 2.8.7)
-project(ethash)
+project(etchash)
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/modules/")
-set(ETHHASH_LIBS ethash)
+set(ETHHASH_LIBS etchash)
 
 if (WIN32 AND WANT_CRYPTOPP)
 	add_subdirectory(cryptopp)

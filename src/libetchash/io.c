@@ -1,18 +1,18 @@
 /*
-  This file is part of ethash.
+  This file is part of etchash.
 
-  ethash is free software: you can redistribute it and/or modify
+  etchash is free software: you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
   the Free Software Foundation, either version 3 of the License, or
   (at your option) any later version.
 
-  ethash is distributed in the hope that it will be useful,
+  etchash is distributed in the hope that it will be useful,
   but WITHOUT ANY WARRANTY; without even the implied warranty of
   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
   GNU General Public License for more details.
 
   You should have received a copy of the GNU General Public License
-  along with ethash.  If not, see <http://www.gnu.org/licenses/>.
+  along with etchash.  If not, see <http://www.gnu.org/licenses/>.
 */
 /** @file io.c
  * @author Lefteris Karapetsas <lefteris@ethdev.com>
@@ -23,27 +23,27 @@
 #include <stdio.h>
 #include <errno.h>
 
-enum ethash_io_rc ethash_io_prepare(
+enum etchash_io_rc etchash_io_prepare(
 	char const* dirname,
-	ethash_h256_t const seedhash,
+	etchash_h256_t const seedhash,
 	FILE** output_file,
 	uint64_t file_size,
 	bool force_create
 )
 {
 	char mutable_name[DAG_MUTABLE_NAME_MAX_SIZE];
-	enum ethash_io_rc ret = ETCHASH_IO_FAIL;
+	enum etchash_io_rc ret = ETCHASH_IO_FAIL;
 	// reset errno before io calls
 	errno = 0;
 
 	// assert directory exists
-	if (!ethash_mkdir(dirname)) {
-		ETCHASH_CRITICAL("Could not create the ethash directory");
+	if (!etchash_mkdir(dirname)) {
+		ETCHASH_CRITICAL("Could not create the etchash directory");
 		goto end;
 	}
 
-	ethash_io_mutable_name(ETCHASH_REVISION, &seedhash, mutable_name);
-	char* tmpfile = ethash_io_create_filename(dirname, mutable_name, strlen(mutable_name));
+	etchash_io_mutable_name(ETCHASH_REVISION, &seedhash, mutable_name);
+	char* tmpfile = etchash_io_create_filename(dirname, mutable_name, strlen(mutable_name));
 	if (!tmpfile) {
 		ETCHASH_CRITICAL("Could not create the full DAG pathname");
 		goto end;
@@ -52,10 +52,10 @@ enum ethash_io_rc ethash_io_prepare(
 	FILE *f;
 	if (!force_create) {
 		// try to open the file
-		f = ethash_fopen(tmpfile, "rb+");
+		f = etchash_fopen(tmpfile, "rb+");
 		if (f) {
 			size_t found_size;
-			if (!ethash_file_size(f, &found_size)) {
+			if (!etchash_file_size(f, &found_size)) {
 				fclose(f);
 				ETCHASH_CRITICAL("Could not query size of DAG file: \"%s\"", tmpfile);
 				goto free_memo;
@@ -85,7 +85,7 @@ enum ethash_io_rc ethash_io_prepare(
 	}
 	
 	// file does not exist, will need to be created
-	f = ethash_fopen(tmpfile, "wb+");
+	f = etchash_fopen(tmpfile, "wb+");
 	if (!f) {
 		ETCHASH_CRITICAL("Could not create DAG file: \"%s\"", tmpfile);
 		goto free_memo;

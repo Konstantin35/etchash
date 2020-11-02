@@ -4,7 +4,7 @@
 /*jslint node: true, shadow:true */
 "use strict";
 
-var ethash = require('./ethash');
+var etchash = require('./etchash');
 var util = require('./util');
 var Keccak = require('./keccak');
 
@@ -24,13 +24,13 @@ if (util.wordsToHexString(dst) != "0eab42de4c3ceb9235fc91acffe746b29c29a8c366b7c
 
 
 // init params
-var ethashParams = ethash.defaultParams();
-//ethashParams.cacheRounds = 0;
+var etchashParams = etchash.defaultParams();
+//etchashParams.cacheRounds = 0;
 
 // create hasher
 var seed = util.hexStringToBytes("9410b944535a83d9adf6bbdcc80e051f30676173c16ca0d32d6f1263fc246466")
 var startTime = new Date().getTime();
-var hasher = new ethash.Etchash(ethashParams, seed);
+var hasher = new etchash.Etchash(etchashParams, seed);
 console.log('Etchash startup took: '+(new Date().getTime() - startTime) + "ms");
 console.log('Etchash cache hash: ' + util.bytesToHexString(hasher.cacheDigest()));
 
