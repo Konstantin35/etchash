@@ -3,8 +3,8 @@
 #include <stdint.h>
 #include <stdlib.h>
 #include <time.h>
-#include "../libethash/ethash.h"
-#include "../libethash/internal.h"
+#include "../libetchash/ethash.h"
+#include "../libetchash/internal.h"
 
 #if PY_MAJOR_VERSION >= 3
 #define PY_STRING_FORMAT "y#"

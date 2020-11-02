@@ -8,7 +8,7 @@ if (WIN32 AND WANT_CRYPTOPP)
 	add_subdirectory(cryptopp)
 endif()
 
-add_subdirectory(src/libethash)
+add_subdirectory(src/libetchash)
 
 add_subdirectory(src/benchmark EXCLUDE_FROM_ALL)
 add_subdirectory(test/c)

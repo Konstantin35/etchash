@@ -22,20 +22,20 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <chrono>
-#include <libethash/ethash.h>
-#include <libethash/util.h>
+#include <libetchash/ethash.h>
+#include <libetchash/util.h>
 #ifdef OPENCL
-#include <libethash-cl/ethash_cl_miner.h>
+#include <libetchash-cl/ethash_cl_miner.h>
 #endif
 #include <vector>
 #include <algorithm>
 
 #ifdef WITH_CRYPTOPP
-#include <libethash/sha3_cryptopp.h>
+#include <libetchash/sha3_cryptopp.h>
 #include <string>
 
 #else
-#include "libethash/sha3.h"
+#include "libetchash/sha3.h"
 #endif // WITH_CRYPTOPP
 
 #undef min

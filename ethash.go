@@ -19,7 +19,7 @@
 package ethash
 
 /*
-#include "src/libethash/internal.h"
+#include "src/libetchash/internal.h"
 
 int ethashGoCallback_cgo(unsigned);
 */

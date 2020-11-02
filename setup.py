@@ -3,30 +3,30 @@ import os
 from distutils.core import setup, Extension
 sources = [
     'src/python/core.c',
-    'src/libethash/io.c',
-    'src/libethash/internal.c',
-    'src/libethash/sha3.c']
+    'src/libetchash/io.c',
+    'src/libetchash/internal.c',
+    'src/libetchash/sha3.c']
 if os.name == 'nt':
     sources += [
-        'src/libethash/util_win32.c',
-        'src/libethash/io_win32.c',
-        'src/libethash/mmap_win32.c',
+        'src/libetchash/util_win32.c',
+        'src/libetchash/io_win32.c',
+        'src/libetchash/mmap_win32.c',
     ]
 else:
     sources += [
-        'src/libethash/io_posix.c'
+        'src/libetchash/io_posix.c'
     ]
 depends = [
-    'src/libethash/ethash.h',
-    'src/libethash/compiler.h',
-    'src/libethash/data_sizes.h',
-    'src/libethash/endian.h',
-    'src/libethash/ethash.h',
-    'src/libethash/io.h',
-    'src/libethash/fnv.h',
-    'src/libethash/internal.h',
-    'src/libethash/sha3.h',
-    'src/libethash/util.h',
+    'src/libetchash/ethash.h',
+    'src/libetchash/compiler.h',
+    'src/libetchash/data_sizes.h',
+    'src/libetchash/endian.h',
+    'src/libetchash/ethash.h',
+    'src/libetchash/io.h',
+    'src/libetchash/fnv.h',
+    'src/libetchash/internal.h',
+    'src/libetchash/sha3.h',
+    'src/libetchash/util.h',
 ]
 pyethash = Extension('pyethash',
                      sources=sources,

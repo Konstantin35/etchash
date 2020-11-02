@@ -1,15 +1,15 @@
 #include <iomanip>
-#include <libethash/fnv.h>
-#include <libethash/ethash.h>
-#include <libethash/internal.h>
-#include <libethash/io.h>
+#include <libetchash/fnv.h>
+#include <libetchash/ethash.h>
+#include <libetchash/internal.h>
+#include <libetchash/io.h>
 
 #ifdef WITH_CRYPTOPP
 
-#include <libethash/sha3_cryptopp.h>
+#include <libetchash/sha3_cryptopp.h>
 
 #else
-#include <libethash/sha3.h>
+#include <libetchash/sha3.h>
 #endif // WITH_CRYPTOPP
 
 #ifdef _WIN32
