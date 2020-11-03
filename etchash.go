@@ -460,7 +460,7 @@ func makeSeedHash(blockNum uint64) (sh common.Hash) {
 		epoch = blockNum / epochLengthECIP1099
 	}
 	for ; epoch > 0; epoch-- {
-		sh = crypto.Sha3Hash(sh[:])
+		sh = crypto.Keccak256Hash(sh[:])
 	}
 	return sh
 }
