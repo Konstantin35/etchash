@@ -13,7 +13,7 @@ ubuntu:
 
 ### Coding Style for C++ code:
 
-Follow the same exact style as in [cpp-ethereum](https://github.com/ethereum/cpp-ethereum/blob/develop/CodingStandards.txt)
+Follow the same exact style as in [cpp-ethereum](https://github.com/ethereum/aleth/blob/master/CODING_STYLE.md)
 
 ### Coding Style for C code:
 
